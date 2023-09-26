@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, send_file
 
 app = Flask(__name__)
 
-@app.route('/')
+@app.route('/img')
 def index():
     return send_file('static/img.png', mimetype='image/png')
 
