@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Log</title>
+  <style>
+    body {
+        font-family: Consolas, serif;
+    }
+    p {
+        margin: 0.5rem 0 0;
+    }
+  </style>
+</head>
+<body>
+  <div>
+    <h1>Log</h1>
+    <br>
+    {% for line in log_data %}
+      <p>{{ line }}</p>
+    {% endfor %}
+  </div>
+</body>
+</html>
