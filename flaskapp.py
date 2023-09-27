@@ -103,6 +103,7 @@ def change_image():
     log(request.url, log_type='ip', ip=request.remote_addr)
     if 'username' not in session.keys():
         return redirect('/login')
+    username = session['username']
 
     message = None
     if request.method == 'POST':
@@ -136,7 +137,7 @@ def change_image():
         log(e, log_type='error')
         return e
 
-    return render_template('index.html', image_url=image_url, link_url=link_url, message=message)
+    return render_template('index.html', image_url=image_url, link_url=link_url, message=message, username=username)
 
 @app.route('/log')
 def show_log():
