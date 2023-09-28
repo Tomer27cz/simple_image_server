@@ -1,0 +1,107 @@
+body {
+    background-color: white;
+    font-family: 'Consolas', serif;
+    font-size: 1.2rem;
+    text-wrap: normal;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+:root
+{
+    --bs-nav-link-font-size: 1.5rem;
+}
+
+.nav-charita {
+    background-color: #fff;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+.nav-logo {
+    height: 4rem;
+    width: 4rem;
+    vertical-align: middle;
+}
+.navbar-brand h1 {
+     color:#000;
+     font-family:minion-pro,serif;
+     font-size:1.75rem;
+     font-weight:600;
+     margin-left:6px;
+     text-transform:none;
+}
+.username {
+    color: rgb(200, 200, 200);
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0.5rem;
+    text-decoration: none;
+}
+
+.div-login {
+    /*text-align: center;*/
+    padding: 1rem;
+    margin: 1rem;
+    border-radius: 1rem;
+    background-color: rgb(240, 240, 240);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+.e-div {
+    display: flex;
+    justify-content: space-between;
+}
+.r-img {
+    width: 100%;
+}
+.r-selection {
+    padding-top: 1rem!important;
+    padding-bottom: 1rem!important;
+}
+
+.dont-break-out {
+  /* These are technically the same, but use both */
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+
+  /* Adds a hyphen where the word breaks, if supported (No Blink) */
+  -ms-hyphens: auto;
+  -moz-hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+
+}
+.r-url {
+    margin-top: 1rem;
+}
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 80vh;
+}
+.login-box {
+    width: 30rem;
+    padding: 2rem;
+    border-radius: 1rem;
+    background-color: rgb(240, 240, 240);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+.login-label {
+    font-size: 1.5rem;
+    font-weight: 400;
+    margin-bottom: 0.5rem;
+}
+.login-icon {
+    font-size: 1.25rem;
+}
+
+footer {
+    margin-top: auto;
+    background-color: rgb(240, 240, 240);
+    box-shadow: 0.5rem 0 2rem rgba(0, 0, 0, 0.15);
+}

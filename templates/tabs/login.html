@@ -1,0 +1,57 @@
+{% extends 'base/base.html' %}
+
+{% block head %}
+<title>Sign in</title>
+{% endblock %}
+
+{% block content %}
+  {% if message %}
+    <div class="alert alert-warning div-align alert-dismissible fade show" role="alert">
+      {{ message }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  {% endif %}
+
+  <div class="login-container">
+    <div class="login-box">
+     <form method="post">
+        <div class="card-body p-5">
+          <h1 class="mb-5 text-center" style="color: #b91919">Sign in</h1>
+
+          <div class="form-outline mb-4">
+            <label class="form-label login-label" for="typeEmailX-2">Username</label>
+            <input type="text" id="typeEmailX-2" class="form-control form-control-lg login-entry" name="username"/>
+          </div>
+
+          <div class="form-outline mb-4" id="show_hide_password">
+            <label class="form-label login-label" for="password">Password</label>
+            <div class="input-group mb-4" style="margin: 0!important;">
+              <input type="password" id="password" class="form-control form-control-lg login-entry" name="password"/>
+              <a class="btn btn-outline-secondary" id="toggle"><i class="bi bi-eye-slash login-icon" id="icon"></i></a>
+            </div>
+          </div>
+
+          <div class="text-center">
+            <button class="btn btn-danger btn-lg btn-block" type="submit">Login</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+  <script>
+      const icon = document.getElementById("icon");
+      const toggle = document.getElementById("toggle");
+      const password = document.getElementById("password");
+      toggle.addEventListener("click", function() {
+        if (password.type === "password") {
+          password.type = "text";
+          icon.classList.remove("bi-eye-slash");
+          icon.classList.add("bi-eye");
+        } else {
+          password.type = "password";
+          icon.classList.remove("bi-eye");
+          icon.classList.add("bi-eye-slash");
+        }
+      });
+  </script>
+{% endblock %}

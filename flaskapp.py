@@ -72,33 +72,23 @@ def log(text_data, log_type='text', ip=None) -> None:
     with open(f"{config.PATH}log.txt", "a", encoding="utf-8") as f:
         f.write(message + "\n")
 
+
+@app.route('/base')
+def base():
+    return render_template('base/base.html')
+
+# Tabs
+# Home
 @app.route('/')
 def index():
-    return image()
+    if 'username' in session.keys():
+        username = session['username']
+    else:
+        username = None
+    return render_template('tabs/home.html', username=username)
 
-@app.route('/image')
-def image():
-    try:
-        image_url = get_current_image()
-    except Exception as e:
-        return str(e)
-
-    resp = redirect(image_url)
-    resp.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
-    resp.headers['Cache-Control'] = 'post-check=0, pre-check=0'
-    resp.headers['Pragma'] = 'no-cache'
-    return resp
-
-@app.route('/link')
-def link():
-    try:
-        link_url = get_current_link()
-    except Exception as e:
-        return str(e)
-
-    return redirect(link_url)
-
-@app.route('/caritas2014', methods=['POST', 'GET'])
+# Email Banner
+@app.route('/redirect', methods=['POST', 'GET'])
 def change_image():
     log(request.url, log_type='ip', ip=request.remote_addr)
     if 'username' not in session.keys():
@@ -137,13 +127,15 @@ def change_image():
         log(e, log_type='error')
         return e
 
-    return render_template('index.html', image_url=image_url, link_url=link_url, message=message, username=username)
+    return render_template('tabs/redirect.html', image_url=image_url, link_url=link_url, message=message, username=username, web_url=config.WEB_URL)
 
+# Log
 @app.route('/log')
 def show_log():
     log(request.url, log_type='ip', ip=request.remote_addr)
     if 'username' not in session.keys():
         return redirect('/login')
+    username = session['username']
 
     try:
         with open(f'{config.PATH}log.txt', 'r', encoding='utf-8') as file:
@@ -152,17 +144,40 @@ def show_log():
         log(e, log_type='error')
         return f'Error: {e}'
 
-    return render_template('log.html', log_data=log_data)
+    return render_template('tabs/log.html', log_data=log_data, username=username)
 
-@app.route('/logout')
-def logout():
-    log(request.url, log_type='ip', ip=request.remote_addr)
-    session.clear()
-    return redirect('/login')
 
+# Redirects
+@app.route('/image')
+def image():
+    try:
+        image_url = get_current_image()
+    except Exception as e:
+        return str(e)
+
+    resp = redirect(image_url)
+    resp.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+    resp.headers['Cache-Control'] = 'post-check=0, pre-check=0'
+    resp.headers['Pragma'] = 'no-cache'
+    return resp
+
+@app.route('/link')
+def link():
+    try:
+        link_url = get_current_link()
+    except Exception as e:
+        return str(e)
+
+    return redirect(link_url)
+
+
+# Login
 @app.route('/login', methods=['POST', 'GET'])
 def login():
     log(request.url, log_type='ip', ip=request.remote_addr)
+    if 'username' in session.keys():
+        return redirect('/')
+
     if request.method == 'POST':
         if 'username' in request.form and 'password' in request.form:
             username = request.form['username']
@@ -171,12 +186,18 @@ def login():
                 if username == user['username'] and password == user['password']:
                     session['username'] = username
                     log(f'({username}) logged in successfully', log_type='web', ip=request.remote_addr)
-                    return redirect('/caritas2014')
+                    return redirect('/')
             log(f'({username}) tried to login with wrong password: ({password})', log_type='web', ip=request.remote_addr)
-            return render_template('login.html', message='Incorrect username or password')
+            return render_template('tabs/login.html', message='Incorrect username or password')
         log(f'({request.remote_addr}) tried to login without username or password', log_type='web', ip=request.remote_addr)
-        return render_template('login.html', message='Please enter username and password')
-    return render_template('login.html')
+        return render_template('tabs/login.html', message='Please enter username and password')
+    return render_template('tabs/login.html')
+
+@app.route('/logout')
+def logout():
+    log(request.url, log_type='ip', ip=request.remote_addr)
+    session.clear()
+    return redirect('/login')
 
 if __name__ == '__main__':
     app.run(debug=True)
