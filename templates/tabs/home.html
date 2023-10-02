@@ -1,5 +1,37 @@
 {% extends "base/base.html" %}
 
+{% block head %}
+  <title>Simple Redirect Server</title>
+{% endblock %}
+
 {% block content %}
-    <h1>Home</h1>
+    <div class="text-center ch-color m-5">
+      <h1 class="h-text">Simple Redirect Server</h1>
+    </div>
+    <div class="container h-container">
+      <a class="btn btn-main h-item" href="/redirect"><h1>Banner</h1></a>
+      <a class="btn btn-main h-item" href="/analytics"><h1>Analytics</h1></a>
+      <a class="btn btn-secondary h-item" href="/log"><h1>Log</h1></a>
+    </div>
+    <div class="container mb-4">
+      <div class="div-login">
+      <div class="text-center ch-color">
+        <h1>Current</h1>
+      </div>
+      <div class="text-center sec-color d-flex justify-content-evenly">
+        <h5>Redirected Images: {{ count[0] }}</h5>
+        <h5>Redirected Links: {{ count[1] }}</h5>
+      </div>
+      <div class="dont-break-out">
+        <h4>Image URL: <a href="{{ image_url }}" target="_blank" rel="noopener noreferrer">{{ image_url }}</a></h4>
+        <a href="{{ web_url }}/image" class="sec-color" target="_blank"
+           rel="noopener noreferrer">{{ web_url }}/image</a>
+      </div>
+      <div class="r-url dont-break-out">
+        <h4>Link URL: <a href="{{ link_url }}" target="_blank" rel="noopener noreferrer">{{ link_url }}</a></h4>
+        <a href="{{ web_url }}/link" class="sec-color" target="_blank"
+           rel="noopener noreferrer">{{ web_url }}/link</a>
+      </div>
+    </div>
+    </div>
 {% endblock %}

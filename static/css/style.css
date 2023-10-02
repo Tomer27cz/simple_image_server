@@ -11,7 +11,27 @@ body {
 :root
 {
     --bs-nav-link-font-size: 1.5rem;
+    --main-color: #b91919;
+    --main-color-darker: #961414;
 }
+
+.btn-main {
+    --bs-btn-color: #fff;
+    --bs-btn-bg: var(--main-color);
+    --bs-btn-border-color: var(--main-color);
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: var(--main-color-darker);
+    --bs-btn-hover-border-color: var(--main-color-darker);
+    --bs-btn-focus-shadow-rgb: 225, 83, 97;
+    --bs-btn-active-color: #fff;
+    --bs-btn-active-bg: var(--main-color-darker);
+    --bs-btn-active-border-color: var(--main-color-darker);
+    --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+    --bs-btn-disabled-color: #fff;
+    --bs-btn-disabled-bg: var(--main-color);
+    --bs-btn-disabled-border-color: var(--main-color);
+}
+
 
 .nav-charita {
     background-color: #fff;
@@ -23,8 +43,7 @@ body {
     margin-bottom: 0.5rem;
 }
 .nav-logo {
-    height: 4rem;
-    width: 4rem;
+    height: 3.5rem;
     vertical-align: middle;
 }
 .navbar-brand h1 {
@@ -106,7 +125,7 @@ footer {
     box-shadow: 0.5rem 0 2rem rgba(0, 0, 0, 0.15);
 }
 .ch-color {
-    color: #b91919;
+    color: var(--main-color);
 }
 .sec-color {
     text-decoration: none;
@@ -183,4 +202,48 @@ footer {
     font-size: 1.25rem;
     font-weight: 400;
     color: gray;
+}
+.not-found {
+    color: var(--main-color);
+}
+
+.not-found h1 {
+    font-size: 15rem;
+    font-weight: 600;
+}
+.not-found h2 {
+    font-size: 4rem;
+    font-weight: 600;
+}
+.not-found p {
+    font-size: 2rem;
+    font-weight: 400;
+    color: gray;
+}
+
+/* Home */
+.h-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+    border-radius: 1rem;
+    padding: 1rem;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    margin-bottom: 3rem;
+    align-self: center;
+    justify-self: center;
+}
+.h-item {
+    flex: 1;
+}
+.h-text {
+    font-weight: 600;
+    font-size: 5rem;
+    overflow-x: hidden;
+}
+@media screen and (max-width: 575px) {
+  .h-text {
+    font-size: 9vw;
+  }
 }

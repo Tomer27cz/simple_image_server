@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-utilities.min.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-  <link rel="icon" href="{{ url_for('static', filename='favicon/logo.svg') }}" sizes="any">
+  <link rel="icon" href="{{ favicon_url }}" sizes="any">
   <script>
       if (window.history.replaceState) {
           window.history.replaceState(null, null, window.location.href);
@@ -17,6 +17,13 @@
           if (scroll_pos) window.scrollTo({top: Number(scroll_pos), behavior: 'smooth'});
       });
   </script>
+  <style>
+    :root
+    {
+        --main-color: {{ main_color }};
+        --main-color-darker: {{ main_color_dark }};
+    }
+  </style>
   {% block head %}{% endblock %}
 </head>
 <body>
@@ -24,8 +31,7 @@
   <nav class="navbar sticky-top navbar-expand-lg nav-charita" data-bs-theme="light">
     <div class="container-fluid">
       <a class="navbar-brand d-flex" href="/" title="Oblastní charita Pardubice">
-        <img class="nav-logo" data-src="/static/favicon/logo.svg" alt="Oblastní charita Pardubice" data-cmp-index="15" data-cmp-observed="1" data-cmp-blocked="0" src="/static/favicon/logo.svg">
-        <h1>Oblastní charita<br>Pardubice</h1>
+        <img class="nav-logo" src="{{ logo_url }}" alt="Logo" data-cmp-index="15" data-cmp-observed="1" data-cmp-blocked="0">
       </a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
               aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -50,9 +56,9 @@
         <div>
           {% if username %}
             <a class="username">{{ username }}</a>
-            <a class="btn btn-danger" href="/logout">Logout</a>
+            <a class="btn btn-main" href="/logout">Logout</a>
           {% else %}
-            <a class="btn btn-danger" href="/login">Login</a>
+            <a class="btn btn-main" href="/login">Login</a>
           {% endif %}
         </div>
       </div>
@@ -66,7 +72,7 @@
     <div class="row">
       <div class="col-lg-4 mb-2">
         <a class="d-inline-flex align-items-center mb-2 text-body-emphasis text-decoration-none" href="/">
-          <img src="https://pardubice.charita.cz/res/archive/019/002425.png" alt="Logo" style="width: 100%">
+          <img src="{{ logo_url }}" alt="Logo" style="width: 100%">
         </a>
         <ul class="list-unstyled small">
           <li class="mb-2">Designed and built by <a href="https://github.com/Tomer27cz" target="_blank" rel="noopener noreferrer">Tomer27cz</a>,
@@ -77,7 +83,7 @@
           <li class="mb-2">Code licensed <a
               href="https://github.com/Tomer27cz/discord_bot_stanley_the_7th/blob/main/LICENSE" target="_blank"
               rel="license noopener">MIT</a></li>
-          <li class="mb-2">Currently v1.1</li>
+          <li class="mb-2">Currently v1.2</li>
         </ul>
       </div>
       <div class="col-6 col-lg-2 offset-lg-2 mb-2">

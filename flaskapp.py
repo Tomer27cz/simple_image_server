@@ -7,6 +7,9 @@ from typing import TypedDict, Union, TYPE_CHECKING
 
 app = Flask(__name__)
 app.secret_key = config.SECRET_KEY
+@app.context_processor
+def inject_globals():
+    return dict(logo_url=config.LOGO_URL, favicon_url=config.FAVICON_URL, main_color=config.MAIN_COLOR, main_color_dark=config.MAIN_COLOR_DARK)
 
 # header('Content-Type: image/jpeg');
 # header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
@@ -30,12 +33,11 @@ if TYPE_CHECKING:
         url: str
         redirected: int
         data: AnalyticsDataData
+        usage_data: list[dict]
 
     class Analytics(TypedDict):
         image: list[AnalyticsData]
         link: list[AnalyticsData]
-
-
 
 # Data
 def get_data() -> dict:
@@ -44,7 +46,7 @@ def get_data() -> dict:
             data = json.load(file)
     except Exception as e:
         log(e, log_type='error')
-        raise f'Error: {e}'
+        raise e
     return data
 
 # Analytics
@@ -54,7 +56,7 @@ def get_analytics() -> dict:
             data = json.load(file)
     except Exception as e:
         log(e, log_type='error')
-        raise f'Error: {e}'
+        raise e
     return data
 
 # Get Data
@@ -92,7 +94,8 @@ def update_data(author: str, image_url=None, link_url=None) -> None:
                     'start': int(time()),
                     'end': None
                 }
-            }
+            },
+            'usage_data': []
         })
     if link_url:
         data['link_url'] = link_url
@@ -106,7 +109,8 @@ def update_data(author: str, image_url=None, link_url=None) -> None:
                     'start': int(time()),
                     'end': None
                 }
-            }
+            },
+            'usage_data': []
         })
 
     try:
@@ -116,22 +120,69 @@ def update_data(author: str, image_url=None, link_url=None) -> None:
             json.dump(analytics, file, indent=4)
     except Exception as e:
         log(e, log_type='error')
-        raise f'Error: {e}'
+        raise e
 
 # Update Analytics
-def update_analytics(url_type: Union['image', 'link']) -> None:
+def update_analytics(url_type: Union['image', 'link'], request_data) -> None:
     analytics = get_analytics()
     if url_type == 'image':
         analytics['image'][-1]['redirected'] += 1
     if url_type == 'link':
         analytics['link'][-1]['redirected'] += 1
+        usage_data = {
+            'url': request_data.url,
+            'user_agent': {
+                'string': request_data.user_agent.string,
+                'platform': request_data.user_agent.platform,
+                'browser': request_data.user_agent.browser,
+                'version': request_data.user_agent.version,
+                'language': request_data.user_agent.language
+            },
+            'environment': {
+                'HTTP_ACCEPT': request_data.environ.get('HTTP_ACCEPT', None),
+                'HTTP_ACCEPT_ENCODING': request_data.environ.get('HTTP_ACCEPT_ENCODING', None),
+                'HTTP_ACCEPT_LANGUAGE': request_data.environ.get('HTTP_ACCEPT_LANGUAGE', None),
+                'HTTP_CONNECTION': request_data.environ.get('HTTP_CONNECTION', None),
+                'HTTP_COOKIE': request_data.environ.get('HTTP_COOKIE', None),
+                'HTTP_HOST': request_data.environ.get('HTTP_HOST', None),
+                'HTTP_SEC_CH_UA': request_data.environ.get('HTTP_SEC_CH_UA', None),
+                'HTTP_SEC_CH_UA_MOBILE': request_data.environ.get('HTTP_SEC_CH_UA_MOBILE', None),
+                'HTTP_SEC_CH_UA_PLATFORM': request_data.environ.get('HTTP_SEC_CH_UA_PLATFORM', None),
+                'HTTP_SEC_FETCH_DEST': request_data.environ.get('HTTP_SEC_FETCH_DEST', None),
+                'HTTP_SEC_FETCH_MODE': request_data.environ.get('HTTP_SEC_FETCH_MODE', None),
+                'HTTP_SEC_FETCH_SITE': request_data.environ.get('HTTP_SEC_FETCH_SITE', None),
+                'HTTP_SEC_FETCH_USER': request_data.environ.get('HTTP_SEC_FETCH_USER', None),
+                'HTTP_UPGRADE_INSECURE_REQUESTS': request_data.environ.get('HTTP_UPGRADE_INSECURE_REQUESTS', None),
+                'HTTP_USER_AGENT': request_data.environ.get('HTTP_USER_AGENT', None),
+                'QUERY_STRING': request_data.environ.get('QUERY_STRING', None),
+                'REMOTE_ADDR': request_data.environ.get('REMOTE_ADDR', None),
+                'REMOTE_PORT': request_data.environ.get('REMOTE_PORT', None),
+                'REQUEST_METHOD': request_data.environ.get('REQUEST_METHOD', None)
+            },
+            'cookies': request_data.cookies,
+            'blueprint': request_data.blueprint,
+            'view_args': request_data.view_args,
+            'remote_addr': request_data.remote_addr,
+            'x_forwarded_for': request_data.headers.get('X-Forwarded-For', request_data.remote_addr),
+            'authorization': request_data.headers.get('Authorization', None),
+            'ip_info': request_data.headers.get('X-IP-Info', None),
+            'path': request_data.path,
+            'speed': request_data.headers.get('X-Speed', None),
+            'date': strftime("%Y-%m-%d %H:%M:%S", gmtime()),
+            'timestamp': int(time()),
+            'method': request_data.method,
+            'scheme': request_data.scheme,
+            'host': request_data.host,
+            'base_url': request_data.base_url
+        }
+        analytics['link'][-1]['usage_data'] += [usage_data]
 
     try:
         with open(f'{config.PATH}db/analytics.json', 'w') as file:
             json.dump(analytics, file, indent=4)
     except Exception as e:
         log(e, log_type='error')
-        raise f'Error: {e}'
+        raise e
 
 # Other
 def struct_to_time(struct_time, first='date') -> str:
@@ -180,13 +231,25 @@ def log(text_data, log_type='text', ip=None) -> None:
 # Home
 @app.route('/')
 def index():
+    log(request.url, log_type='ip', ip=request.remote_addr)
     if 'username' in session.keys():
         username = session['username']
     else:
         username = None
-    return render_template('tabs/home.html', username=username)
+    try:
+        count = get_total_count()
+        web_url = config.WEB_URL
+        data = get_data()
+        image_url = data['image_url']
+        link_url = data['link_url']
+    except Exception as e:
+        log(e, log_type='error')
+        return render_template('base/500.html', error=e, ), 500
+
+    return render_template('tabs/home.html', username=username, count=count, web_url=web_url, image_url=image_url, link_url=link_url)
 
 # Email Banner
+@app.route('/caritas2014')
 @app.route('/redirect', methods=['POST', 'GET'])
 def change_image():
     log(request.url, log_type='ip', ip=request.remote_addr)
@@ -221,11 +284,12 @@ def change_image():
         image_url = get_image()
         link_url = get_link()
         count = get_current_count()
+        total = get_total_count()
     except Exception as e:
         log(e, log_type='error')
-        return e
+        return render_template('base/500.html', error=e), 500
 
-    return render_template('tabs/redirect.html', image_url=image_url, link_url=link_url, message=message, username=username, web_url=config.WEB_URL, count=count)
+    return render_template('tabs/redirect.html', image_url=image_url, link_url=link_url, message=message, username=username, web_url=config.WEB_URL, count=count, total=total)
 
 # Log
 @app.route('/log')
@@ -240,7 +304,7 @@ def show_log():
             log_data = file.readlines()
     except Exception as e:
         log(e, log_type='error')
-        return f'Error: {e}'
+        return render_template('base/500.html', error=e), 500
 
     return render_template('tabs/log.html', log_data=log_data, username=username)
 
@@ -258,7 +322,7 @@ def show_analytics():
             total = get_total_count()
     except Exception as e:
         log(e, log_type='error')
-        return f'Error: {e}'
+        return render_template('base/500.html', error=e), 500
 
     return render_template('tabs/analytics.html', data=analytics, username=username, total=total, struct_to_time=struct_to_time, reversed=reversed)
 
@@ -268,9 +332,9 @@ def show_analytics():
 def image():
     try:
         image_url = get_image()
-        update_analytics(url_type='image')
+        update_analytics(url_type='image', request_data=request)
     except Exception as e:
-        return str(e)
+        return render_template('base/500.html', error=e), 500
 
     resp = redirect(image_url)
     resp.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
@@ -282,10 +346,9 @@ def image():
 def link():
     try:
         link_url = get_link()
-        update_analytics(url_type='link')
+        update_analytics(url_type='link', request_data=request)
     except Exception as e:
-        return str(e)
-
+        return render_template('base/500.html', error=e), 500
     return redirect(link_url)
 
 
@@ -316,6 +379,20 @@ def logout():
     log(request.url, log_type='ip', ip=request.remote_addr)
     session.clear()
     return redirect('/login')
+
+
+# Page Not Found
+@app.errorhandler(404)
+def page_not_found(e):
+    log(request.url, log_type='ip', ip=request.remote_addr)
+    return render_template('base/404.html', error=e), 404
+
+# Internal Server Error
+@app.errorhandler(500)
+def internal_server_error(e):
+    log(request.url, log_type='ip', ip=request.remote_addr)
+    return render_template('base/500.html', error=e), 500
+
 
 if __name__ == '__main__':
     app.run(debug=True)

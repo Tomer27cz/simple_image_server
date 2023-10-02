@@ -17,18 +17,21 @@
         <div class="text-center ch-color">
           <h1>Current</h1>
         </div>
-        <div class="text-center sec-color">
-          <h5>Redirected Image: {{ count[0] }} | Redirected Link: {{ count[1] }}</h5>
-        </div>
+        <div class="text-center sec-color d-flex justify-content-evenly">
+        <h5>Redirected Images: {{ total[0] }}</h5>
+        <h5>Redirected Links: {{ total[1] }}</h5>
+      </div>
         <div class="dont-break-out">
           <h4>Image URL: <a href="{{ image_url }}" target="_blank" rel="noopener noreferrer">{{ image_url }}</a></h4>
           <a href="{{ web_url }}/image" class="sec-color" target="_blank"
              rel="noopener noreferrer">{{ web_url }}/image</a>
+          <h5 class="sec-color">Redirected Image: {{ count[0] }}</h5>
         </div>
         <div class="r-url dont-break-out">
           <h4>Link URL: <a href="{{ link_url }}" target="_blank" rel="noopener noreferrer">{{ link_url }}</a></h4>
           <a href="{{ web_url }}/link" class="sec-color" target="_blank"
              rel="noopener noreferrer">{{ web_url }}/link</a>
+          <h5 class="sec-color">Redirected Link: {{ count[1] }}</h5>
         </div>
       </div>
       <div class="div-login m-5">
@@ -42,12 +45,12 @@
         <form class="e-div" method="post">
           <h4 class="form-control-plaintext" style="flex: 0 0 25%;">Image URL</h4>
           <input type="url" class="form-control m-3" id="imageURL" name="image_url">
-          <button type="submit" class="btn btn-danger mb-3 m-3">Submit</button>
+          <button type="submit" class="btn btn-main mb-3 m-3">Submit</button>
         </form>
         <form class="e-div" method="post">
           <h4 class="form-control-plaintext" style="flex: 0 0 25%;">Link URL</h4>
           <input type="url" class="form-control m-3" id="linkURL" name="link_url">
-          <button type="submit" class="btn btn-danger mb-3 m-3">Submit</button>
+          <button type="submit" class="btn btn-main mb-3 m-3">Submit</button>
         </form>
       </div>
     </div>

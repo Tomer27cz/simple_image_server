@@ -9,7 +9,8 @@
                     "start": 0,
                     "end": null
                 }
-            }
+            },
+            "usage_data": []
         }
     ],
     "link": [
@@ -22,7 +23,8 @@
                     "start": 0,
                     "end": null
                 }
-            }
+            },
+            "usage_data": []
         }
     ]
 }
