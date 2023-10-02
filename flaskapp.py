@@ -3,7 +3,7 @@ import config
 import sys
 import json
 from time import gmtime, strftime, time
-from typing import TypedDict, Union
+from typing import TypedDict, Union, TYPE_CHECKING
 
 app = Flask(__name__)
 app.secret_key = config.SECRET_KEY
@@ -13,31 +13,32 @@ app.secret_key = config.SECRET_KEY
 # header("Cache-Control: post-check=0, pre-check=0", false);
 # header("Pragma: no-cache");
 
-class Data(TypedDict):
-    image_url: str
-    link_url: str
+if TYPE_CHECKING:
+    class Data(TypedDict):
+        image_url: str
+        link_url: str
 
-class AnalyticsDataDataTimestamp(TypedDict):
-    start: int
-    end: Union[int, None]
+    class AnalyticsDataDataTimestamp(TypedDict):
+        start: int
+        end: Union[int, None]
 
-class AnalyticsDataData(TypedDict):
-    author: str
-    timestamp: AnalyticsDataDataTimestamp
+    class AnalyticsDataData(TypedDict):
+        author: str
+        timestamp: AnalyticsDataDataTimestamp
 
-class AnalyticsData(TypedDict):
-    url: str
-    redirected: int
-    data: AnalyticsDataData
+    class AnalyticsData(TypedDict):
+        url: str
+        redirected: int
+        data: AnalyticsDataData
 
-class Analytics(TypedDict):
-    image: list[AnalyticsData]
-    link: list[AnalyticsData]
+    class Analytics(TypedDict):
+        image: list[AnalyticsData]
+        link: list[AnalyticsData]
 
 
 
 # Data
-def get_data() -> Data:
+def get_data() -> dict:
     try:
         with open(f'{config.PATH}db/data.json', 'r') as file:
             data = json.load(file)
@@ -47,7 +48,7 @@ def get_data() -> Data:
     return data
 
 # Analytics
-def get_analytics() -> Analytics:
+def get_analytics() -> dict:
     try:
         with open(f'{config.PATH}db/analytics.json', 'r') as file:
             data = json.load(file)
@@ -63,12 +64,12 @@ def get_link() -> str:
     return get_data()['link_url']
 
 # Get Analytics
-def get_current_count() -> tuple[int, int]:
+def get_current_count() -> tuple:
     analytics: Analytics = get_analytics()
     image_count = analytics['image'][-1]['redirected'] if analytics['image'] else 0
     link_count = analytics['link'][-1]['redirected'] if analytics['link'] else 0
     return image_count, link_count
-def get_total_count() -> tuple[int, int]:
+def get_total_count() -> tuple:
     analytics: Analytics = get_analytics()
     image_count = sum([i['redirected'] for i in analytics['image']])
     link_count = sum([i['redirected'] for i in analytics['link']])
