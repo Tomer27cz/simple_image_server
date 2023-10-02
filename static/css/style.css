@@ -65,8 +65,8 @@ body {
 
 .dont-break-out {
   /* These are technically the same, but use both */
-  overflow-wrap: break-word;
-  word-wrap: break-word;
+  overflow-wrap: break-word!important;
+  word-wrap: break-word!important;
 
   /* Adds a hyphen where the word breaks, if supported (No Blink) */
   -ms-hyphens: auto;
@@ -104,4 +104,83 @@ footer {
     margin-top: auto;
     background-color: rgb(240, 240, 240);
     box-shadow: 0.5rem 0 2rem rgba(0, 0, 0, 0.15);
+}
+.ch-color {
+    color: #b91919;
+}
+.sec-color {
+    text-decoration: none;
+    color: gray
+}
+
+/* Analytics */
+.a-cont {
+    margin: 0 5rem 0 5rem;
+}
+.a-accordion {
+    --bs-accordion-active-bg: None;
+    --bs-accordion-active-color: None;
+    --bs-accordion-btn-focus-border-color: None;
+    --bs-accordion-btn-focus-box-shadow: None;
+    --bs-accordion-bg: None;
+    padding: 0;
+}
+.a-total {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    padding: 1rem;
+    border-radius: 1rem;
+    background-color: rgb(240, 240, 240);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    margin: 0 1rem 1rem;
+
+}
+
+.a-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: left;
+    gap: 1rem;
+    border-radius: 1rem;
+    padding: 1rem;
+    background-color: rgb(240, 240, 240);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    margin: 0 1rem 1rem;
+}
+/* img */
+.a-img-container {
+    display: flex;
+    justify-content: center;
+    flex: 0 0 20%;
+    align-self: center;
+}
+
+.a-img {
+    width: auto;
+    height: auto;
+    border-radius: 1rem;
+    max-width: 16rem;
+    max-height: 9rem;
+    align-self: center;
+    aspect-ratio: initial;
+}
+/* text */
+.a-text {
+    width: 55%;
+    flex: 1;
+    align-self: center;
+}
+.a-data {
+    align-self: center;
+}
+
+.a-container p {
+    margin: 0;
+    font-size: 1.5rem;
+}
+.a-container span {
+    font-size: 1.25rem;
+    font-weight: 400;
+    color: gray;
 }

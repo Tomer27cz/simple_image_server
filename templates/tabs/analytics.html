@@ -1,0 +1,82 @@
+{% extends 'base/base.html' %}
+
+{% block head %}
+  <title>Analytics</title>
+{% endblock %}
+
+{% block content %}
+  {% if message %}
+    <div class="alert alert-warning div-align alert-dismissible fade show" role="alert">
+      {{ message }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  {% endif %}
+  <section style="background: white">
+    <div class="container-fluid r-selection">
+      <div class="div-login">
+        <h1 class="ch-color text-center">Total</h1>
+        <div class="a-total">
+          <h2>Image Redirections: {{ total[0] }}</h2>
+          <h2>Link Redirections: {{ total[1] }}</h2>
+        </div>
+      </div>
+      <div class="accordion accordion-flush div-login a-accordion" id="accordionFlush">
+        <div class="accordion-item">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                  data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+            <h1 class="accordion-header ch-color text-center">
+              Image Analytics
+            </h1>
+          </button>
+          <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionFlush">
+            <div class="accordion-body">
+              {% for item in reversed(data['image']) %}
+                <div class="a-container">
+                  <div class="a-img-container">
+                    <img loading="lazy" src="{{ item['url'] }}" alt="Preview" class="a-img">
+                  </div>
+                  <div class="a-text">
+                    <p class="dont-break-out"><span>Redirected:</span> {{ item['redirected'] }}</p>
+                    <p class="dont-break-out"><a href="{{ item['url'] }}" target="_blank" rel="noopener noreferrer">{{ item['url'] }}</a></p>
+                  </div>
+                  <div class="a-data">
+                    <p class="dont-break-out"><span>Active from: </span>{{ struct_to_time(item['data']['timestamp']['start']) }}</p>
+                    <p class="dont-break-out"><span>Active to: </span>{{ struct_to_time(item['data']['timestamp']['end']) }}</p>
+                    <p class="dont-break-out"><span>Author: </span>{{ item['data']['author'] }}</p>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="accordion accordion-flush div-login a-accordion mt-4" id="accordionFlushTwo">
+        <div class="accordion-item">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                  data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+            <h1 class="accordion-header ch-color text-center">
+              Link Analytics
+            </h1>
+          </button>
+          <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionFlushTwo">
+            <div class="accordion-body">
+              {% for item in reversed(data['link']) %}
+                <div class="a-container">
+                  <div class="a-text">
+                    <p class="dont-break-out"><span>Redirected:</span> {{ item['redirected'] }}</p>
+                    <p class="dont-break-out"><a href="{{ item['url'] }}" target="_blank" rel="noopener noreferrer">{{ item['url'] }}</a></p>
+                  </div>
+                  <div class="a-data">
+                    <p class="dont-break-out"><span>Active from: </span>{{ struct_to_time(item['data']['timestamp']['start']) }}</p>
+                    <p class="dont-break-out"><span>Active to: </span>{{ struct_to_time(item['data']['timestamp']['end']) }}</p>
+                    <p class="dont-break-out"><span>Author: </span>{{ item['data']['author'] }}</p>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+{% endblock %}

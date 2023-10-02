@@ -1,7 +1,7 @@
 {% extends 'base/base.html' %}
 
 {% block head %}
-<title>Email Banner</title>
+  <title>Email Banner</title>
 {% endblock %}
 
 {% block content %}
@@ -14,37 +14,42 @@
   <section style="background: white">
     <div class="container r-selection">
       <div class="div-login">
-      <div style="text-align: center">
-        <h1 style="color: #b91919">Current</h1>
+        <div class="text-center ch-color">
+          <h1>Current</h1>
+        </div>
+        <div class="text-center sec-color">
+          <h5>Redirected Image: {{ count[0] }} | Redirected Link: {{ count[1] }}</h5>
+        </div>
+        <div class="dont-break-out">
+          <h4>Image URL: <a href="{{ image_url }}" target="_blank" rel="noopener noreferrer">{{ image_url }}</a></h4>
+          <a href="{{ web_url }}/image" class="sec-color" target="_blank"
+             rel="noopener noreferrer">{{ web_url }}/image</a>
+        </div>
+        <div class="r-url dont-break-out">
+          <h4>Link URL: <a href="{{ link_url }}" target="_blank" rel="noopener noreferrer">{{ link_url }}</a></h4>
+          <a href="{{ web_url }}/link" class="sec-color" target="_blank"
+             rel="noopener noreferrer">{{ web_url }}/link</a>
+        </div>
       </div>
-      <div class="dont-break-out">
-        <h4>Image URL: <a href="{{ image_url }}">{{ image_url }}</a></h4>
-        <a href="{{ web_url }}/image" style="text-decoration: none; color: gray">{{ web_url }}/image</a>
+      <div class="div-login m-5">
+        <img src="{{ image_url }}" alt="Email Banner" class="r-img">
       </div>
-      <div class="r-url dont-break-out">
-        <h4>Link URL: <a href="{{ link_url }}">{{ link_url }}</a></h4>
-        <a href="{{ web_url }}/link" style="text-decoration: none; color: gray">{{ web_url }}/link</a>
+      <div class="div-login m-5">
+        <div class="text-center ch-color">
+          <h1>Change</h1>
+          <br>
+        </div>
+        <form class="e-div" method="post">
+          <h4 class="form-control-plaintext" style="flex: 0 0 25%;">Image URL</h4>
+          <input type="url" class="form-control m-3" id="imageURL" name="image_url">
+          <button type="submit" class="btn btn-danger mb-3 m-3">Submit</button>
+        </form>
+        <form class="e-div" method="post">
+          <h4 class="form-control-plaintext" style="flex: 0 0 25%;">Link URL</h4>
+          <input type="url" class="form-control m-3" id="linkURL" name="link_url">
+          <button type="submit" class="btn btn-danger mb-3 m-3">Submit</button>
+        </form>
       </div>
     </div>
-      <div class="div-login" style="margin-top: 3rem">
-        <img src="{{ image_url }}" alt="Preview" class="r-img">
-      </div>
-      <div class="div-login" style="margin-top: 3rem">
-      <div style="text-align: center">
-        <h1 style="color: #b91919">Change</h1>
-        <br>
-      </div>
-      <form class="e-div" method="post">
-        <h4 class="form-control-plaintext" style="flex: 0 0 25%;">Image URL</h4>
-        <input type="url" class="form-control" style="margin: 1rem" id="imageURL" name="image_url">
-        <button type="submit" class="btn btn-danger mb-3" style="margin: 1rem">Submit</button>
-      </form>
-      <form class="e-div" method="post">
-        <h4 class="form-control-plaintext" style="flex: 0 0 25%;">Link URL</h4>
-        <input type="url" class="form-control" style="margin: 1rem" id="linkURL" name="link_url">
-        <button type="submit" class="btn btn-danger mb-3" style="margin: 1rem">Submit</button>
-      </form>
-    </div>
-  </div>
   </section>
 {% endblock %}

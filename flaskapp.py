@@ -1,7 +1,9 @@
 from flask import Flask, render_template, request, redirect, session
 import config
 import sys
+import json
 from time import gmtime, strftime, time
+from typing import TypedDict, Union
 
 app = Flask(__name__)
 app.secret_key = config.SECRET_KEY
@@ -11,24 +13,126 @@ app.secret_key = config.SECRET_KEY
 # header("Cache-Control: post-check=0, pre-check=0", false);
 # header("Pragma: no-cache");
 
-def get_current_image():
+class Data(TypedDict):
+    image_url: str
+    link_url: str
+
+class AnalyticsDataDataTimestamp(TypedDict):
+    start: int
+    end: Union[int, None]
+
+class AnalyticsDataData(TypedDict):
+    author: str
+    timestamp: AnalyticsDataDataTimestamp
+
+class AnalyticsData(TypedDict):
+    url: str
+    redirected: int
+    data: AnalyticsDataData
+
+class Analytics(TypedDict):
+    image: list[AnalyticsData]
+    link: list[AnalyticsData]
+
+
+
+# Data
+def get_data() -> Data:
     try:
-        with open(f'{config.PATH}static/url.txt', 'r') as file:
-            image_url = file.read()
+        with open(f'{config.PATH}db/data.json', 'r') as file:
+            data = json.load(file)
     except Exception as e:
         log(e, log_type='error')
         raise f'Error: {e}'
-    return image_url
+    return data
 
-def get_current_link():
+# Analytics
+def get_analytics() -> Analytics:
     try:
-        with open(f'{config.PATH}static/link.txt', 'r') as file:
-            link_url = file.read()
+        with open(f'{config.PATH}db/analytics.json', 'r') as file:
+            data = json.load(file)
     except Exception as e:
         log(e, log_type='error')
         raise f'Error: {e}'
-    return link_url
+    return data
 
+# Get Data
+def get_image() -> str:
+    return get_data()['image_url']
+def get_link() -> str:
+    return get_data()['link_url']
+
+# Get Analytics
+def get_current_count() -> tuple[int, int]:
+    analytics: Analytics = get_analytics()
+    image_count = analytics['image'][-1]['redirected'] if analytics['image'] else 0
+    link_count = analytics['link'][-1]['redirected'] if analytics['link'] else 0
+    return image_count, link_count
+def get_total_count() -> tuple[int, int]:
+    analytics: Analytics = get_analytics()
+    image_count = sum([i['redirected'] for i in analytics['image']])
+    link_count = sum([i['redirected'] for i in analytics['link']])
+    return image_count, link_count
+
+# Update Data
+def update_data(author: str, image_url=None, link_url=None) -> None:
+    data: Data = get_data()
+    analytics: Analytics = get_analytics()
+
+    if image_url:
+        data['image_url'] = image_url
+        analytics['image'][-1]['data']['timestamp']['end'] = int(time())
+        analytics['image'].append({
+            'url': image_url,
+            'redirected': 0,
+            'data': {
+                'author': author,
+                'timestamp': {
+                    'start': int(time()),
+                    'end': None
+                }
+            }
+        })
+    if link_url:
+        data['link_url'] = link_url
+        analytics['link'][-1]['data']['timestamp']['end'] = int(time())
+        analytics['link'].append({
+            'url': link_url,
+            'redirected': 0,
+            'data': {
+                'author': author,
+                'timestamp': {
+                    'start': int(time()),
+                    'end': None
+                }
+            }
+        })
+
+    try:
+        with open(f'{config.PATH}db/data.json', 'w') as file:
+            json.dump(data, file, indent=4)
+        with open(f'{config.PATH}db/analytics.json', 'w') as file:
+            json.dump(analytics, file, indent=4)
+    except Exception as e:
+        log(e, log_type='error')
+        raise f'Error: {e}'
+
+# Update Analytics
+def update_analytics(url_type: Union['image', 'link']) -> None:
+    analytics = get_analytics()
+    if url_type == 'image':
+        analytics['image'][-1]['redirected'] += 1
+    if url_type == 'link':
+        analytics['link'][-1]['redirected'] += 1
+
+    try:
+        with open(f'{config.PATH}db/analytics.json', 'w') as file:
+            json.dump(analytics, file, indent=4)
+    except Exception as e:
+        log(e, log_type='error')
+        raise f'Error: {e}'
+
+# Other
 def struct_to_time(struct_time, first='date') -> str:
     """
     Converts struct_time to time string
@@ -40,7 +144,7 @@ def struct_to_time(struct_time, first='date') -> str:
         try:
             struct_time = int(struct_time)
         except (ValueError, TypeError):
-            return struct_time
+            return 'Now'
 
     if first == 'date':
         return strftime("%d/%m/%Y %H:%M:%S", gmtime(struct_time))
@@ -72,12 +176,6 @@ def log(text_data, log_type='text', ip=None) -> None:
     with open(f"{config.PATH}log.txt", "a", encoding="utf-8") as f:
         f.write(message + "\n")
 
-
-@app.route('/base')
-def base():
-    return render_template('base/base.html')
-
-# Tabs
 # Home
 @app.route('/')
 def index():
@@ -101,8 +199,7 @@ def change_image():
             log(f'{session["username"]} is trying change image url to {request.form["image_url"]}')
             f = request.form['image_url']
             try:
-                with open(f'{config.PATH}static/url.txt', 'w') as file:
-                    file.write(f)
+                update_data(author=username, image_url=f)
                 message = f'Image URL: {f} - Saved Successfully!'
                 log(f'{session["username"]} changed image url to {request.form["image_url"]}')
             except Exception as e:
@@ -112,8 +209,7 @@ def change_image():
             log(f'{session["username"]} is trying change link url to {request.form["link_url"]}')
             f = request.form['link_url']
             try:
-                with open(f'{config.PATH}static/link.txt', 'w') as file:
-                    file.write(f)
+                update_data(author=username, link_url=f)
                 message = f'Link URL: {f} - Saved Successfully!'
                 log(f'{session["username"]} changed link url to {request.form["link_url"]}')
             except Exception as e:
@@ -121,13 +217,14 @@ def change_image():
                 return f'Error: {e}'
 
     try:
-        image_url = get_current_image()
-        link_url = get_current_link()
+        image_url = get_image()
+        link_url = get_link()
+        count = get_current_count()
     except Exception as e:
         log(e, log_type='error')
         return e
 
-    return render_template('tabs/redirect.html', image_url=image_url, link_url=link_url, message=message, username=username, web_url=config.WEB_URL)
+    return render_template('tabs/redirect.html', image_url=image_url, link_url=link_url, message=message, username=username, web_url=config.WEB_URL, count=count)
 
 # Log
 @app.route('/log')
@@ -146,12 +243,31 @@ def show_log():
 
     return render_template('tabs/log.html', log_data=log_data, username=username)
 
+# Analytics
+@app.route('/analytics')
+def show_analytics():
+    log(request.url, log_type='ip', ip=request.remote_addr)
+    if 'username' not in session.keys():
+        return redirect('/login')
+    username = session['username']
+
+    try:
+        with open(f'{config.PATH}db/analytics.json', 'r') as file:
+            analytics = json.load(file)
+            total = get_total_count()
+    except Exception as e:
+        log(e, log_type='error')
+        return f'Error: {e}'
+
+    return render_template('tabs/analytics.html', data=analytics, username=username, total=total, struct_to_time=struct_to_time, reversed=reversed)
+
 
 # Redirects
 @app.route('/image')
 def image():
     try:
-        image_url = get_current_image()
+        image_url = get_image()
+        update_analytics(url_type='image')
     except Exception as e:
         return str(e)
 
@@ -164,7 +280,8 @@ def image():
 @app.route('/link')
 def link():
     try:
-        link_url = get_current_link()
+        link_url = get_link()
+        update_analytics(url_type='link')
     except Exception as e:
         return str(e)
 

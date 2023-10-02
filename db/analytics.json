@@ -1,0 +1,28 @@
+{
+    "image": [
+        {
+            "url": "https://pardubice.charita.cz/res/archive/019/002425.png",
+            "redirected": 0,
+            "data": {
+                "author": "tomer",
+                "timestamp": {
+                    "start": 0,
+                    "end": null
+                }
+            }
+        }
+    ],
+    "link": [
+        {
+            "url": "https://pardubice.charita.cz/",
+            "redirected": 0,
+            "data": {
+                "author": "tomer",
+                "timestamp": {
+                    "start": 0,
+                    "end": null
+                }
+            }
+        }
+    ]
+}
